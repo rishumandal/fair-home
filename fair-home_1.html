@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fair Home 🏠</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Sora:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:#FFF8F0;color:#1a1a2e;min-height:100vh}
+    .app{min-height:100vh;padding:1rem}
+    .screen{max-width:480px;margin:0 auto}
+
+    /* Login */
+    .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;padding:2rem}
+    .login-logo{font-family:'Sora',sans-serif;font-size:2rem;font-weight:700;color:#E8622A}
+    .login-logo span{color:#1a1a2e}
+    .login-sub{font-size:14px;color:#888;text-align:center;max-width:260px;line-height:1.6}
+    .role-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:320px}
+    .role-card{background:#fff;border:2px solid #f0e8df;border-radius:20px;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:all 0.2s}
+    .role-card:hover{border-color:#E8622A;transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,98,42,0.12)}
+    .role-icon{font-size:2.5rem}
+    .role-label{font-family:'Sora',sans-serif;font-weight:600;font-size:14px}
+
+    /* Header */
+    .header{display:flex;align-items:center;justify-content:space-between;padding:1rem 0 1.5rem}
+    .header-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1.1rem;color:#1a1a2e}
+    .back-btn{background:none;border:none;cursor:pointer;font-size:13px;color:#E8622A;font-family:'Nunito',sans-serif;font-weight:700;padding:6px 12px;background:#FFF0E8;border-radius:20px}
+
+    /* Kid tabs */
+    .kid-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:1.5rem}
+    .kid-tab{background:#fff;border:2px solid #f0e8df;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;font-family:'Nunito',sans-serif}
+    .kid-tab.active{background:#E8622A;border-color:#E8622A;color:#fff}
+
+    /* Score card */
+    .score-card{background:linear-gradient(135deg,#E8622A,#F4A261);border-radius:24px;padding:1.5rem;color:#fff;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center}
+    .score-card h2{font-family:'Sora',sans-serif;font-size:2.5rem;font-weight:700}
+    .score-card p{font-size:13px;opacity:0.85;margin-top:4px}
+    .score-card .badge-wrap{background:rgba(255,255,255,0.2);border-radius:16px;padding:8px 16px;text-align:center}
+    .score-card .badge-wrap span{font-size:2rem}
+    .score-card .badge-wrap p{font-size:11px;margin-top:2px}
+
+    /* Task list */
+    .section-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px}
+    .task-item{background:#fff;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px;border:2px solid transparent;transition:all 0.2s;cursor:pointer}
+    .task-item.done{border-color:#E8622A;background:#FFF8F5}
+    .task-item.done .task-name{text-decoration:line-through;color:#bbb}
+    .check-circle{width:26px;height:26px;border-radius:50%;border:2px solid #e0d8d0;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
+    .task-item.done .check-circle{background:#E8622A;border-color:#E8622A;color:#fff;font-size:14px}
+    .task-name{font-weight:700;font-size:14px;flex:1}
+    .task-pts{font-size:12px;color:#E8622A;font-weight:700;background:#FFF0E8;padding:3px 10px;border-radius:20px}
+
+    /* Parent view */
+    .kids-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+    .kid-stat-card{background:#fff;border-radius:20px;padding:1.25rem;border:2px solid #f0e8df}
+    .kid-stat-card .kid-name{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px}
+    .kid-stat-card .kid-score{font-size:2rem;font-weight:800;color:#E8622A}
+    .kid-stat-card .kid-done{font-size:12px;color:#888;margin-top:2px}
+    .progress-bar{height:6px;background:#f0e8df;border-radius:6px;margin-top:10px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#E8622A,#F4A261);border-radius:6px;transition:width 0.5s}
+    .winner-badge{display:inline-block;font-size:10px;background:#FFF0E8;color:#E8622A;padding:2px 8px;border-radius:20px;font-weight:700;margin-top:6px}
+
+    /* Add task form */
+    .add-task-form{background:#fff;border-radius:20px;padding:1.25rem;margin-bottom:1.5rem;border:2px solid #f0e8df}
+    .add-task-form input{width:100%;border:1.5px solid #f0e8df;border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;color:#1a1a2e;background:#FFF8F0;outline:none;margin-bottom:10px}
+    .add-task-form input:focus{border-color:#E8622A}
+    .add-btn{width:100%;background:#E8622A;color:#fff;border:none;border-radius:12px;padding:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:opacity 0.15s}
+    .add-btn:hover{opacity:0.9}
+    .reward-row{display:flex;gap:8px}
+    .reward-row input{margin-bottom:0}
+    .empty{text-align:center;padding:2rem;color:#bbb;font-size:14px}
+
+    /* Footer credit */
+    .footer{text-align:center;font-size:11px;color:#ccc;padding:2rem 0 1rem}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const {useState} = React;
+
+// ============================================
+// DATA — change kid names here to your own!
+// ============================================
+const INITIAL_TASKS = [
+  {id:1, name:"Wash dishes",    points:10},
+  {id:2, name:"Sweep the floor", points:15},
+  {id:3, name:"Take out trash",  points:10},
+  {id:4, name:"Do laundry",      points:20},
+  {id:5, name:"Cook dinner",     points:25},
+];
+
+
+
+// ============================================
+// LOGIN SCREEN
+// ============================================
+function LoginScreen({onLogin}) {
+  return React.createElement("div", {className:"login-wrap"},
+    React.createElement("div", null,
+      React.createElement("div", {className:"login-logo"},
+        "fair", React.createElement("span", null, "home"), " 🏠"
+      ),
+      React.createElement("p", {className:"login-sub", style:{marginTop:"8px"}},
+        "Every hand counts. Every task matters."
+      )
+    ),
+    React.createElement("div", {className:"role-cards"},
+      React.createElement("div", {className:"role-card", onClick:()=>onLogin("parent")},
+        React.createElement("span", {className:"role-icon"}, "👨‍👩‍👧"),
+        React.createElement("span", {className:"role-label"}, "Parent")
+      ),
+      React.createElement("div", {className:"role-card", onClick:()=>onLogin("kid")},
+        React.createElement("span", {className:"role-icon"}, "🧒"),
+        React.createElement("span", {className:"role-label"}, "Kid")
+      )
+    ),
+    React.createElement("p", {className:"footer"}, "Built by Rishu · Fair Home v1.0")
+  );
+}
+
+// ============================================
+// KID VIEW
+// ============================================
+function KidView({kids, tasks, completions, onToggle, onBack}) {
+  const [activeKid, setActiveKid] = useState(kids[0].id);
+  const kid = kids.find(k => k.id === activeKid);
+  const myDone = completions[activeKid] || {};
+
+  // Calculate score: sum points of completed tasks
+  const myScore = tasks.reduce((sum, t) => myDone[t.id] ? sum + t.points : sum, 0);
+  const doneTasks = tasks.filter(t => myDone[t.id]);
+  const pendingTasks = tasks.filter(t => !myDone[t.id]);
+
+  // Find who is leading
+  const ranked = kids.slice().sort((a, b) => {
+    const sa = tasks.reduce((s,t) => ((completions[a.id]||{})[t.id] ? s+t.points : s), 0);
+    const sb = tasks.reduce((s,t) => ((completions[b.id]||{})[t.id] ? s+t.points : s), 0);
+    return sb - sa;
+  });
+  const isLeading = ranked[0].id === activeKid && myScore > 0;
+
+  return React.createElement("div", {className:"app"},
+    React.createElement("div", {className:"screen"},
+
+      // Header
+      React.createElement("div", {className:"header"},
+        React.createElement("button", {className:"back-btn", onClick:onBack}, "← Back"),
+        React.createElement("div", {className:"header-title"}, "Fair Home 🏠"),
+        React.createElement("span", {style:{width:60}})
+      ),
+
+      // Kid selector tabs
+      React.createElement("div", {className:"kid-tabs"},
+        kids.map(k =>
+          React.createElement("div", {
+            key: k.id,
+            className: "kid-tab" + (activeKid === k.id ? " active" : ""),
+            onClick: () => setActiveKid(k.id)
+          }, k.avatar + " " + k.name)
+        )
+      ),
+
+      // Score card
+      React.createElement("div", {className:"score-card"},
+        React.createElement("div", null,
+          React.createElement("p", {style:{fontSize:"13px",opacity:0.8}}, "Your score"),
+          React.createElement("h2", null, myScore + " pts"),
+          React.createElement("p", null, doneTasks.length + " of " + tasks.length + " tasks done"),
+          isLeading ? React.createElement("div", {
+            style:{marginTop:"10px",background:"rgba(255,255,255,0.25)",display:"inline-block",padding:"4px 12px",borderRadius:"20px",fontSize:"12px",fontWeight:"700"}
+          }, "🏆 Leading!") : null
+        ),
+        React.createElement("div", {className:"badge-wrap"},
+          React.createElement("span", null, kid.avatar),
+          React.createElement("p", null, kid.name)
+        )
+      ),
+
+      // Pending tasks
+      pendingTasks.length > 0 && React.createElement("div", null,
+        React.createElement("p", {className:"section-title"}, "To do"),
+        pendingTasks.map(t =>
+          React.createElement("div", {key:t.id, className:"task-item", onClick:()=>onToggle(activeKid, t.id)},
+            React.createElement("div", {className:"check-circle"}),
+            React.createElement("span", {className:"task-name"}, t.name),
+            React.createElement("span", {className:"task-pts"}, "+" + t.points)
+          )
+        )
+      ),
+
+      // Done tasks
+      doneTasks.length > 0 && React.createElement("div", {style:{marginTop:"1rem"}},
+        React.createElement("p", {className:"section-title"}, "Done ✓"),
+        doneTasks.map(t =>
+          React.createElement("div", {key:t.id, className:"task-item done", onClick:()=>onToggle(activeKid, t.id)},
+            React.createElement("div", {className:"check-circle"}, "✓"),
+            React.createElement("span", {className:"task-name"}, t.name),
+            React.createElement("span", {className:"task-pts"}, "+" + t.points)
+          )
+        )
+      ),
+
+      tasks.length === 0 && React.createElement("div", {className:"empty"},
+        "No tasks yet. Ask your parent to add some!"
+      )
+    )
+  );
+}
+
+// ============================================
+// PARENT VIEW
+// ============================================
+function ParentView({kids, tasks, setTasks, completions, onBack, addKid, renameKid, removeKid}) {
+  const [taskName, setTaskName] = useState("");
+  const [taskPts, setTaskPts]   = useState("10");
+
+  // Calculate scores for each kid
+  const scores = kids.map(k => ({
+    ...k,
+    score: tasks.reduce((s,t) => ((completions[k.id]||{})[t.id] ? s+t.points : s), 0),
+    done:  tasks.filter(t => (completions[k.id]||{})[t.id]).length
+  })).sort((a,b) => b.score - a.score);
+
+  const maxScore = Math.max(...scores.map(s => s.score), 1);
+
+  function addTask() {
+    if (!taskName.trim()) return;
+    setTasks(prev => [...prev, {
+      id: Date.now(),
+      name: taskName.trim(),
+      points: parseInt(taskPts) || 10
+    }]);
+    setTaskName("");
+    setTaskPts("10");
+  }
+
+  return React.createElement("div", {className:"app"},
+    React.createElement("div", {className:"screen"},
+
+      React.createElement("div", {className:"header"},
+        React.createElement("button", {className:"back-btn", onClick:onBack}, "← Back"),
+        React.createElement("div", {className:"header-title"}, "Parent Dashboard"),
+        React.createElement("span", {style:{width:60}})
+      ),
+
+      // Scoreboard
+      React.createElement("p", {className:"section-title"}, "This week's scoreboard"),
+      React.createElement("div", {className:"kids-grid"},
+        scores.map((k, i) =>
+          React.createElement("div", {key:k.id, className:"kid-stat-card"},
+            React.createElement("div", {style:{display:"flex",alignItems:"center",gap:"6px",marginBottom:"4px"}},
+              React.createElement("span", null, k.avatar),
+              React.createElement("input", {
+                value: k.name,
+                onChange: e => renameKid(k.id, e.target.value),
+                style:{border:"none",borderBottom:"1.5px solid #f0e8df",fontWeight:"700",background:"transparent",fontFamily:"'Sora',sans-serif",fontSize:"13px",width:"100%",outline:"none",padding:"2px 0"}
+              }),
+              kids.length > 1 ? React.createElement("span", {
+                onClick: () => removeKid(k.id),
+                style:{cursor:"pointer",color:"#ccc",fontSize:"16px",lineHeight:1,flexShrink:0}
+              }, "×") : null
+            ),
+            React.createElement("div", {className:"kid-score"}, k.score),
+            React.createElement("div", {className:"kid-done"}, k.done + " tasks done"),
+            React.createElement("div", {className:"progress-bar"},
+              React.createElement("div", {className:"progress-fill", style:{width: Math.round(k.score/maxScore*100)+"%"}})
+            ),
+            i===0 && k.score>0 ? React.createElement("div", {className:"winner-badge"}, "🏆 Top contributor") : null
+          )
+        )
+      ),
+      kids.length < 5 && React.createElement("button", {
+        onClick: addKid,
+        style:{width:"100%",background:"#FFF0E8",color:"#E8622A",border:"2px dashed #E8622A",borderRadius:"16px",padding:"12px",fontFamily:"'Sora',sans-serif",fontWeight:"700",fontSize:"13px",cursor:"pointer",marginBottom:"1.5rem"}
+      }, "+ Add Child (" + kids.length + "/5)"),
+
+      // Add task form
+      React.createElement("p", {className:"section-title"}, "Add a task"),
+      React.createElement("div", {className:"add-task-form"},
+        React.createElement("input", {
+          placeholder:"Task name e.g. Wash dishes",
+          value:taskName,
+          onChange:e=>setTaskName(e.target.value)
+        }),
+        React.createElement("div", {className:"reward-row"},
+          React.createElement("input", {
+            type:"number",
+            placeholder:"Points",
+            value:taskPts,
+            onChange:e=>setTaskPts(e.target.value),
+            style:{width:"130px"}
+          })
+        ),
+        React.createElement("button", {className:"add-btn", onClick:addTask}, "+ Add Task")
+      ),
+
+      // All tasks list
+      tasks.length > 0 && React.createElement("div", null,
+        React.createElement("p", {className:"section-title"}, "All tasks (" + tasks.length + ")"),
+        tasks.map(t =>
+          React.createElement("div", {key:t.id, className:"task-item", style:{cursor:"default"}},
+            React.createElement("div", {className:"check-circle"}),
+            React.createElement("span", {className:"task-name"}, t.name),
+            React.createElement("span", {className:"task-pts"}, t.points + " pts")
+          )
+        )
+      ),
+
+      React.createElement("div", {className:"footer"}, "Built by Rishu · Fair Home v1.0")
+    )
+  );
+}
+
+// ============================================
+// MAIN APP — controls which screen shows
+// ============================================
+function App() {
+  const [view, setView]               = useState("login");
+  const [tasks, setTasks]             = useState(INITIAL_TASKS);
+  const [completions, setCompletions] = useState({k1:{}, k2:{}});
+  const [kids, setKids]               = useState([
+    {id:"k1", name:"Child 1", avatar:"🧒"},
+    {id:"k2", name:"Child 2", avatar:"🧒"},
+  ]);
+
+  function toggleTask(kidId, taskId) {
+    setCompletions(prev => ({
+      ...prev,
+      [kidId]: {
+        ...(prev[kidId] || {}),
+        [taskId]: !(prev[kidId] || {})[taskId]
+      }
+    }));
+  }
+
+  function addKid() {
+    if (kids.length >= 5) return;
+    const newId = "k" + Date.now();
+    setKids(prev => [...prev, {id: newId, name: "Child " + (prev.length + 1), avatar:"🧒"}]);
+    setCompletions(prev => ({...prev, [newId]: {}}));
+  }
+
+  function renameKid(kidId, newName) {
+    setKids(prev => prev.map(k => k.id === kidId ? {...k, name: newName} : k));
+  }
+
+  function removeKid(kidId) {
+    if (kids.length <= 1) return;
+    setKids(prev => prev.filter(k => k.id !== kidId));
+    setCompletions(prev => { const c = {...prev}; delete c[kidId]; return c; });
+  }
+
+  if (view === "login")  return React.createElement(LoginScreen, {onLogin: setView});
+  if (view === "kid")    return React.createElement(KidView,     {kids, tasks, completions, onToggle:toggleTask, onBack:()=>setView("login")});
+  if (view === "parent") return React.createElement(ParentView,  {kids, tasks, setTasks, completions, onBack:()=>setView("login"), addKid, renameKid, removeKid});
+}
+
+ReactDOM.render(React.createElement(App), document.getElementById("root"));
+</script>
+</body>
+</html>
